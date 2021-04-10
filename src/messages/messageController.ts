@@ -6,13 +6,10 @@ import {
   ServerGreetingPayload,
   ServerStatusPayload,
 } from './messages';
-import { myID, setID } from './localStorage';
-import socket from './socket';
-
-interface User {
-  id: string;
-  socket: WebSocket;
-}
+import { myID, setID } from '../localStorage';
+import socket from '../socket';
+import { User } from '../DTOs';
+import { ToastAdder } from '../App';
 
 function mapReviver(key: string, value: any) {
   if (typeof value === 'object' && value !== null) {
@@ -42,10 +39,18 @@ export const onMessage = (aMessage: string): void => {
 };
 
 export const onNewUserJoined = (payload: NewUserJoinedPayload): void => {
+  ToastAdder(`New user ${payload.id} joined!`, {
+    appearance: 'success',
+    autoDismiss: false,
+  });
   console.log(MESSAGES.NEW_USER_JOINED);
 };
 
 export const onServerStatus = (payload: ServerStatusPayload): void => {
+  ToastAdder(`Status update!`, {
+    appearance: 'success',
+    autoDismiss: true,
+  });
   console.log(MESSAGES.SERVER_STATUS, payload);
   socket.send(newMessage(MESSAGES.CLIENT_STATUS, { id: myID() }));
 };
