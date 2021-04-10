@@ -9,8 +9,22 @@ import {
 import { myID, setID } from './localStorage';
 import socket from './socket';
 
+interface User {
+  id: string;
+  socket: WebSocket;
+}
+
+function mapReviver(key: string, value: any) {
+  if (typeof value === 'object' && value !== null) {
+    if (value.dataType === 'Map') {
+      return new Map<string, User>(value.value);
+    }
+  }
+  return value;
+}
+
 export const onMessage = (aMessage: string): void => {
-  const interpretMessage: message = JSON.parse(aMessage);
+  const interpretMessage: message = JSON.parse(aMessage, mapReviver);
   switch (interpretMessage.type) {
     case MESSAGES.NEW_USER_JOINED:
       onNewUserJoined(interpretMessage.payload as NewUserJoinedPayload);
@@ -32,7 +46,7 @@ export const onNewUserJoined = (payload: NewUserJoinedPayload): void => {
 };
 
 export const onServerStatus = (payload: ServerStatusPayload): void => {
-  console.log(MESSAGES.SERVER_STATUS);
+  console.log(MESSAGES.SERVER_STATUS, payload);
   socket.send(newMessage(MESSAGES.CLIENT_STATUS, { id: myID() }));
 };
 

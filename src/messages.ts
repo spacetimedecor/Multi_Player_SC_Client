@@ -23,7 +23,7 @@ export type NewUserJoinedPayload = {
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type ServerStatusPayload = {};
+export type ServerStatusPayload = { toClientID: string };
 
 export type ClientStatusPayload = { id: string };
 
@@ -44,13 +44,13 @@ export function newMessage(
       typedPayload = payload as ClientStatusPayload;
       return JSON.stringify({
         type: MESSAGES.CLIENT_STATUS,
-        payload: { id: typedPayload.id } as ClientStatusPayload,
+        payload: typedPayload,
       } as message);
     case MESSAGES.CLIENT_GREETING:
       typedPayload = payload as ClientGreetingPayload;
       return JSON.stringify({
         type: MESSAGES.CLIENT_GREETING,
-        payload: { id: typedPayload.id } as ClientGreetingPayload,
+        payload: typedPayload,
       } as message);
     default:
       return '';
