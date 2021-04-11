@@ -16,6 +16,9 @@ export enum MESSAGES {
   SERVER_GREETING = 'Hello from server!',
   CLIENT_GREETING = 'Hello from client!',
   NEW_USER_JOINED = 'A new user joined, :D OMFG!',
+  WS_SETUP = 'Setting up CLIENT websocket connection',
+  WS_CONNECT = 'Websocket is connected',
+  WS_DISCONNECT = 'Websocket is disconnected',
 }
 
 export type NewUserJoinedPayload = {

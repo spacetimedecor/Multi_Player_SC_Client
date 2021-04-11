@@ -7,9 +7,10 @@ import {
   ServerStatusPayload,
 } from './messages';
 import { myID, setID } from '../localStorage';
-import socket from '../socket';
+import { socket, setup as setupWebsocket } from '../socket';
 import { User } from '../DTOs';
 import { ToastAdder } from '../App';
+import { Dispatch, Middleware } from 'redux';
 
 function mapReviver(key: string, value: any) {
   if (typeof value === 'object' && value !== null) {
@@ -20,22 +21,31 @@ function mapReviver(key: string, value: any) {
   return value;
 }
 
-export const onMessage = (aMessage: string): void => {
-  const interpretMessage: message = JSON.parse(aMessage, mapReviver);
-  switch (interpretMessage.type) {
-    case MESSAGES.NEW_USER_JOINED:
-      onNewUserJoined(interpretMessage.payload as NewUserJoinedPayload);
-      break;
-    case MESSAGES.SERVER_STATUS:
-      onServerStatus(interpretMessage.payload as ServerStatusPayload);
-      break;
-    case MESSAGES.SERVER_GREETING:
-      onServerGreeting(interpretMessage.payload as ServerGreetingPayload);
-      break;
-    default:
-      onUnknownMessage();
-      break;
-  }
+const interpretMessage = (message: string) => JSON.parse(message, mapReviver);
+
+export const messageMiddleware: Middleware = () => {
+  return (dispatch: Dispatch) => (next) => (message: message) => {
+    switch (message.type) {
+      case MESSAGES.SERVER_STATUS:
+        onServerStatus(message.payload as ServerStatusPayload);
+        break;
+      case MESSAGES.SERVER_GREETING:
+        onServerGreeting(message.payload as ServerGreetingPayload);
+        break;
+      case MESSAGES.NEW_USER_JOINED:
+        onNewUserJoined(message.payload as NewUserJoinedPayload);
+        break;
+      case MESSAGES.WS_SETUP:
+        onWebsocketSetup(dispatch);
+        break;
+      default:
+        return next(message);
+    }
+  };
+};
+
+export const onWebsocketSetup = (dispatch: Dispatch): void => {
+  setupWebsocket((ev: MessageEvent) => dispatch(interpretMessage(ev.data)));
 };
 
 export const onNewUserJoined = (payload: NewUserJoinedPayload): void => {
@@ -52,7 +62,7 @@ export const onServerStatus = (payload: ServerStatusPayload): void => {
     autoDismiss: true,
   });
   console.log(MESSAGES.SERVER_STATUS, payload);
-  socket.send(newMessage(MESSAGES.CLIENT_STATUS, { id: myID() }));
+  socket?.send(newMessage(MESSAGES.CLIENT_STATUS, { id: myID() }));
 };
 
 export const onServerGreeting = (payload: ServerGreetingPayload): void => {
@@ -60,7 +70,7 @@ export const onServerGreeting = (payload: ServerGreetingPayload): void => {
     setID(payload.id);
   }
   console.log(MESSAGES.SERVER_GREETING, payload.id);
-  socket.send(newMessage(MESSAGES.CLIENT_GREETING, { id: myID() }));
+  socket?.send(newMessage(MESSAGES.CLIENT_GREETING, { id: myID() }));
 };
 
 export const onUnknownMessage = (): void => {

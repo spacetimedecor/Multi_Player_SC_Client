@@ -1,10 +1,8 @@
-import { onMessage } from '../messages/messageController';
 import { myID } from '../localStorage';
 
-const socket = new WebSocket(`ws://localhost:8081?id=${myID()}`);
+export let socket: WebSocket | null = null;
 
-export default socket;
-
-socket.onmessage = (ev: MessageEvent) => {
-  onMessage(ev.data);
-};
+export function setup(onMessage: (ev: MessageEvent) => void): void {
+  socket = new WebSocket(`ws://localhost:8081?id=${myID()}`);
+  socket.onmessage = onMessage;
+}
