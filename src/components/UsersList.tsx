@@ -1,7 +1,7 @@
 import { ListGroup } from 'react-bootstrap';
-import { DefaultRootState, useSelector, useStore } from 'react-redux';
+import { useSelector } from 'react-redux';
 import React from 'react';
-import { ApplicationState, RootState } from '../state';
+import { RootState } from '../state';
 
 export default (): JSX.Element => {
   const currentUsers: string[] = useSelector(
