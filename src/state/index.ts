@@ -7,8 +7,12 @@ import { messageMiddleware } from '../messages/messageController';
 import { AppReducer } from './reducers';
 
 export const defaultState = {
-  AppReducer: 1,
+  currentUsers: [],
 };
+
+export interface ApplicationState {
+  currentUsers: string[];
+}
 
 const store = configureStore({
   reducer: {
@@ -19,9 +23,8 @@ const store = configureStore({
   devTools: true,
 });
 
-export interface ApplicationState {
-  AppReducer: number;
-}
+export type RootState = ReturnType<typeof store.getState>;
+
 export default store;
 
 // const scReduxController = new SCRedux.SCReduxController(store);

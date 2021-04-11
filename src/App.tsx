@@ -10,6 +10,7 @@ import './App.css';
 
 import store from './state';
 import { MESSAGES, newMessage } from './messages/messages';
+import UsersList from './components/UsersList';
 
 const App = (): JSX.Element => {
   useEffect(() => {
@@ -19,9 +20,7 @@ const App = (): JSX.Element => {
     <Provider store={store}>
       <ReactNotification />
       <Container>
-        <Row>
-          <Col>1 of 1</Col>
-        </Row>
+        <UsersList />
       </Container>
     </Provider>
   );

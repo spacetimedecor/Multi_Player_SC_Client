@@ -30,7 +30,10 @@ export type NewUserJoinedPayload = {
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type ServerStatusPayload = { toClientID: string };
+export type ServerStatusPayload = {
+  toClientID: string;
+  currentUsers: string[];
+};
 
 export type ClientStatusPayload = { id: string };
 

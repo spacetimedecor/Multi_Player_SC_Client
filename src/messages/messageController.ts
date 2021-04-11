@@ -11,21 +11,13 @@ import {
 } from './messages';
 import { myID, setID } from '../localStorage';
 import { setup as setupWebsocket, socket } from '../socket';
-import { User } from '../DTOs';
 import { AnyAction, Dispatch, Middleware, MiddlewareAPI } from 'redux';
 import { store as ToastAdder } from 'react-notifications-component';
 import store from '../state';
 
-function mapReviver(key: string, value: any) {
-  if (typeof value === 'object' && value !== null) {
-    if (value.dataType === 'Map') {
-      return new Map<string, User>(value.value);
-    }
-  }
-  return value;
-}
+const pageIsVisible = () => document.visibilityState === 'visible';
 
-const interpretMessage = (message: string) => JSON.parse(message, mapReviver);
+const interpretMessage = (message: string) => JSON.parse(message);
 
 export const messageMiddleware: Middleware<Dispatch> = ({
   dispatch,
@@ -62,52 +54,57 @@ export const onClientGreeting = (payload: ClientGreetingPayload): void => {
 };
 
 export const onClientStatus = (payload: ClientStatusPayload): void => {
-  ToastAdder.addNotification({
-    title: 'Client status sent up!',
-    message: 'Cool right?',
-    type: 'success',
-    insert: 'top',
-    container: 'bottom-center',
-    animationIn: ['animate__animated', 'animate__zoomIn'],
-    animationOut: ['animate__animated', 'animate__zoomOut'],
-    dismiss: {
-      pauseOnHover: true,
-      duration: 1000,
-    },
-  });
+  if (pageIsVisible()) {
+    ToastAdder.addNotification({
+      title: 'Client status sent up!',
+      message: 'Cool right?',
+      type: 'success',
+      insert: 'top',
+      container: 'bottom-center',
+      animationIn: ['animate__animated', 'animate__zoomIn'],
+      animationOut: ['animate__animated', 'animate__zoomOut'],
+      dismiss: {
+        pauseOnHover: true,
+        duration: 1000,
+      },
+    });
+  }
   socket?.send(stringify(newMessage(MESSAGES.CLIENT_STATUS, payload)));
 };
 
 export const onNewUserJoined = (payload: NewUserJoinedPayload): void => {
-  ToastAdder.addNotification({
-    title: `New user ${payload.id} joined!`,
-    message: 'Amazing',
-    type: 'success',
-    insert: 'bottom',
-    container: 'top-right',
-    animationIn: ['animate__animated', 'animate__slideInDown'],
-    animationOut: ['animate__animated', 'animate__slideOutUp'],
-    dismiss: {
-      duration: 0,
-    },
-  });
+  if (pageIsVisible()) {
+    ToastAdder.addNotification({
+      title: `New user ${payload.id} joined!`,
+      message: 'Amazing',
+      type: 'success',
+      insert: 'bottom',
+      container: 'top-right',
+      animationIn: ['animate__animated', 'animate__slideInDown'],
+      animationOut: ['animate__animated', 'animate__slideOutUp'],
+      dismiss: {
+        duration: 0,
+      },
+    });
+  }
 };
 
 export const onServerStatus = (payload: ServerStatusPayload): void => {
-  ToastAdder.addNotification({
-    title: 'Server status came down!',
-    message: 'Cool right?',
-    type: 'success',
-    insert: 'bottom',
-    container: 'top-center',
-    animationIn: ['animate__animated', 'animate__zoomIn'],
-    animationOut: ['animate__animated', 'animate__zoomOut'],
-    dismiss: {
-      pauseOnHover: true,
-      duration: 1000,
-    },
-  });
-
+  if (pageIsVisible()) {
+    ToastAdder.addNotification({
+      title: 'Server status came down!',
+      message: 'Cool right?',
+      type: 'success',
+      insert: 'bottom',
+      container: 'top-center',
+      animationIn: ['animate__animated', 'animate__zoomIn'],
+      animationOut: ['animate__animated', 'animate__zoomOut'],
+      dismiss: {
+        pauseOnHover: true,
+        duration: 1000,
+      },
+    });
+  }
   store.dispatch(newMessage(MESSAGES.CLIENT_STATUS, { id: myID() }));
 };
 

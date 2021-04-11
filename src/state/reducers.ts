@@ -1,4 +1,9 @@
-import { message, MESSAGES } from '../messages/messages';
+import {
+  message,
+  MESSAGES,
+  ServerStatusPayload,
+  WebsockerSetupPayload,
+} from '../messages/messages';
 import { ApplicationState, defaultState } from './index';
 import { Reducer } from 'redux';
 
@@ -12,9 +17,10 @@ export const AppReducer: Reducer<ApplicationState, message> = (
         ...state,
       };
     case MESSAGES.SERVER_STATUS:
+      const typedMessage = message.payload as ServerStatusPayload;
       return {
         ...state,
-        AppReducer: state.AppReducer + 1,
+        currentUsers: typedMessage.currentUsers,
       };
     case MESSAGES.SERVER_GREETING:
       return {
