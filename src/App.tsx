@@ -1,34 +1,29 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { AddToast, ToastProvider, useToasts } from 'react-toast-notifications';
+import ReactNotification from 'react-notifications-component';
 import { Col, Container, Row } from 'react-bootstrap';
 
+import 'react-notifications-component/dist/theme.css';
+import 'animate.css/animate.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 import store from './state';
-
-export let ToastAdder: AddToast;
-
-const MessageToasts: FunctionComponent = ({ children }): JSX.Element => {
-  const { addToast } = useToasts();
-  ToastAdder = addToast;
-  return <div className="App">{children}</div>;
-};
+import { MESSAGES, newMessage } from './messages/messages';
 
 const App = (): JSX.Element => {
+  useEffect(() => {
+    store.dispatch(newMessage(MESSAGES.WS_SETUP, {}));
+  }, []);
   return (
-    <ToastProvider autoDismissTimeout={1000}>
-      <MessageToasts>
-        <Provider store={store}>
-          <Container>
-            <Row>
-              <Col>1 of 1</Col>
-            </Row>
-          </Container>
-        </Provider>
-      </MessageToasts>
-    </ToastProvider>
+    <Provider store={store}>
+      <ReactNotification />
+      <Container>
+        <Row>
+          <Col>1 of 1</Col>
+        </Row>
+      </Container>
+    </Provider>
   );
 };
 

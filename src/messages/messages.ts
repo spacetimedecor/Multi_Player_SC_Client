@@ -1,14 +1,17 @@
+import { AnyAction } from 'redux';
+
 export type messagePayloadTypes =
   | ServerGreetingPayload
   | ClientGreetingPayload
   | ServerStatusPayload
   | ClientStatusPayload
-  | NewUserJoinedPayload;
+  | NewUserJoinedPayload
+  | WebsockerSetupPayload;
 
-export type message = {
+export interface message extends AnyAction {
   type: MESSAGES;
-  payload: messagePayloadTypes;
-};
+  payload?: messagePayloadTypes;
+}
 
 export enum MESSAGES {
   SERVER_STATUS = 'Just checking in with SERVER status :)',
@@ -19,6 +22,7 @@ export enum MESSAGES {
   WS_SETUP = 'Setting up CLIENT websocket connection',
   WS_CONNECT = 'Websocket is connected',
   WS_DISCONNECT = 'Websocket is disconnected',
+  UNKNOWN = 'Unknown message',
 }
 
 export type NewUserJoinedPayload = {
@@ -30,6 +34,9 @@ export type ServerStatusPayload = { toClientID: string };
 
 export type ClientStatusPayload = { id: string };
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type WebsockerSetupPayload = {};
+
 export type ServerGreetingPayload = {
   id: string;
 };
@@ -40,22 +47,31 @@ export type ClientGreetingPayload = { id: string | null };
 export function newMessage(
   type: MESSAGES,
   payload: messagePayloadTypes
-): string {
-  let typedPayload;
+): message {
   switch (type) {
+    case MESSAGES.WS_SETUP:
+      return {
+        type: MESSAGES.WS_SETUP,
+        payload: payload as WebsockerSetupPayload,
+      } as AnyAction;
     case MESSAGES.CLIENT_STATUS:
-      typedPayload = payload as ClientStatusPayload;
-      return JSON.stringify({
+      return {
         type: MESSAGES.CLIENT_STATUS,
-        payload: typedPayload,
-      } as message);
+        payload: payload as ClientStatusPayload,
+      } as AnyAction;
     case MESSAGES.CLIENT_GREETING:
-      typedPayload = payload as ClientGreetingPayload;
-      return JSON.stringify({
+      return {
         type: MESSAGES.CLIENT_GREETING,
-        payload: typedPayload,
-      } as message);
+        payload: payload as ClientGreetingPayload,
+      } as AnyAction;
     default:
-      return '';
+      return {
+        type: MESSAGES.UNKNOWN,
+        payload: payload,
+      };
   }
+}
+
+export function stringify(message: message): string {
+  return JSON.stringify(message);
 }

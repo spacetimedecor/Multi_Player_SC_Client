@@ -1,41 +1,26 @@
-import {
-  message,
-  MESSAGES,
-  NewUserJoinedPayload,
-  ServerGreetingPayload,
-  ServerStatusPayload,
-} from '../messages/messages';
-import {
-  onNewUserJoined,
-  onServerGreeting,
-  onServerStatus,
-  onUnknownMessage,
-} from '../messages/messageController';
+import { message, MESSAGES } from '../messages/messages';
 import { ApplicationState, defaultState } from './index';
-import { AnyAction, Reducer } from 'redux';
+import { Reducer } from 'redux';
 
-export const AppReducer: Reducer<ApplicationState> = (
+export const AppReducer: Reducer<ApplicationState, message> = (
   state = defaultState,
-  message: AnyAction
+  message: message
 ): ApplicationState => {
   switch (message.type) {
     case MESSAGES.NEW_USER_JOINED:
-      onNewUserJoined(message.payload as NewUserJoinedPayload);
       return {
         ...state,
       };
     case MESSAGES.SERVER_STATUS:
-      onServerStatus(message.payload as ServerStatusPayload);
       return {
         ...state,
+        AppReducer: state.AppReducer + 1,
       };
     case MESSAGES.SERVER_GREETING:
-      onServerGreeting(message.payload as ServerGreetingPayload);
       return {
         ...state,
       };
     default:
-      onUnknownMessage();
       return {
         ...state,
       };
